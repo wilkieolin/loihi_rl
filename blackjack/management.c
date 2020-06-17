@@ -242,7 +242,7 @@ int send_action(runState *s) {
 
   //choose a random first action for exploring starts
   if (step == 0) {
-    action = rand() % 2;
+    action = rand() % N_ACTIONS;
   } else {
     //get the firing rates for action-value estimates
     get_counter_voltages();

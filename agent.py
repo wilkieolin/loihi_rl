@@ -115,7 +115,6 @@ class FullAgent(Agent):
 
         self.noisy = kwargs.get("noisy", False)
         self.seed = kwargs.get("seed", 341257896)
-        self.data_points = 4
 
         self.recordWeights = kwargs.get('recordWeights', False)
         self.recordSpikes = kwargs.get('recordSpikes', False)

@@ -17,6 +17,7 @@ class BlackjackAgent(FullAgent):
         #scale values from (-1,1) to the dynamic memory range & convert to int
 
         self.debug = kwargs.get("debug", False)
+        self.data_points = 4
 
 
     def _create_channels(self):
