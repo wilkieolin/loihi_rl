@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
-#include "bandit.h"
+#include "management.h"
 //parameters like N_ACTIONS are stored here and modified by the host python program
-#include "bandit_params.h"
+#include "parameters.h"
 #include <time.h>
 #include <unistd.h>
 
@@ -77,7 +77,7 @@ int get_highest() {
 
   //find the max
   for (int i = 0; i < N_ACTIONS; i++) {
-    if (counterVoltages[i] > highest) {
+    if ((int)counterVoltages[i] > highest) {
       highest = counterVoltages[i];
       i_highest = i;
     }
@@ -85,7 +85,7 @@ int get_highest() {
 
   //find any values which are tied to it
   for (int i = 0; i < N_ACTIONS; i++) {
-    if (counterVoltages[i] == highest) {
+    if ((int)counterVoltages[i] == highest) {
       ties++;
       tie_locations[i] = 1;
     } else {

@@ -1,12 +1,14 @@
 import os
 import re
 import sys
-sys.path.append("..")
-import agent
 import numpy as np
+sys.path.append("..")
+
+from agent import *
+
 
 """
-Agent which is used for the simple bandit task.
+Agent which is used for the multi-arm bandit task.
 """
 class Bandit(FullAgent):
     def __init__(self, probabilities, **kwargs):
@@ -32,7 +34,7 @@ class Bandit(FullAgent):
         includeDir = os.getcwd()
         self.snip = self.board.createSnip(Phase.EMBEDDED_MGMT,
                                     includeDir=includeDir,
-                                    cFilePath = includeDir + "/bandit.c",
+                                    cFilePath = includeDir + "/management.c",
                                     funcName = "run_cycle",
                                     guardName = "check")
 
@@ -66,7 +68,7 @@ class Bandit(FullAgent):
 
         #return the action values at each location
         spikeChannel = self.board.createChannel(b'spikeChannel', "int", self.n_epochs * self.n_actions)
-        connect(False, rewardChannel)
+        connect(False, spikeChannel)
 
     def get_data(self, n_epochs):
         dataChannel = self.inChannels[0]
@@ -130,7 +132,7 @@ class Bandit(FullAgent):
             setupChannel.write(self.n_estimates, self.start_values.ravel(order='c'))
 
     def set_params_file(self):
-        filename = os.getcwd()+'/bandit_params.h'
+        filename = os.getcwd()+'/parameters.h'
 
         with open(filename) as f:
             data = f.readlines()

@@ -7,7 +7,7 @@ from nxsdk.graph.monitor.probes import SpikeProbeCondition
 import pickle as p
 sys.path.append("..")
 
-import agent
+from blackjackAgent import *
 from analysis_functions import *
 
 n_cards = 10
@@ -35,13 +35,13 @@ conditions = {'dynrange' : dynrange,
             'episodes' : episodes,
             'init_policy' : init_vals}
 
-player = agent.BlackjackAgent(n_actions, 
-                             n_states, 
-                             n_epochs = episodes,
-                             l_epoch = l_epoch,
-                             starting_values = init_vals,
-                             dynrange = dynrange,
-                             n_replicates = replicates)
+player = BlackjackAgent(n_actions, 
+                        n_states, 
+                        n_epochs = episodes,
+                        l_epoch = l_epoch,
+                        starting_values = init_vals,
+                        dynrange = dynrange,
+                        n_replicates = replicates)
 
 
 results = {}
