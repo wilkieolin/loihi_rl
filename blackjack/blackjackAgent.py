@@ -2,7 +2,7 @@ import os
 import re
 import sys
 sys.path.append("..")
-import agent
+from agent import *
 import numpy as np
 
 """
