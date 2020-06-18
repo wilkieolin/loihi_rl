@@ -351,17 +351,13 @@ int advance_state(int action) {
   bool allowed = false;
 
   if (action == North) { //map actions/locations to unique transitions between points on a toroid
-    transition[0] = location[0];
-    transition[1] = mod(location[1], GRID_Y);
-    allowed = (bool)poloidalTransitions[transition[0]][transition[1]];
+    allowed = (bool)poloidalTransitions[location[0]][location[1]];
   } else if (action == South) {
     transition[0] = location[0];
     transition[1] = mod((location[1] - 1), GRID_Y);
     allowed = (bool)poloidalTransitions[transition[0]][transition[1]];
   } else if (action == East) {
-    transition[0] = mod(location[0], GRID_X);
-    transition[1] = location[1];
-    allowed = (bool)toroidalTransitions[transition[0]][transition[1]];
+    allowed = (bool)toroidalTransitions[location[0]][location[1]];
   } else { //West
     transition[0] = mod((location[0] - 1), GRID_X);
     transition[1] = location[1];

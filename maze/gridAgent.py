@@ -167,9 +167,9 @@ class GridAgent(FullAgent):
         if rectBounds:
             for i in range(5):
                 #the right (toroidal) wall
-                self.walls.append((i, self.dims[1]-1, "south"))
+                self.walls.append((i, self.dims[1]-1, "east"))
                 #the bottom (poloidal) wall
-                self.walls.append((self.dims[0]-1, i, "east"))
+                self.walls.append((self.dims[0]-1, i, "south"))
 
         self.transitions = np.ones((2,self.dims[0], self.dims[1]), dtype=np.int)
 
@@ -180,14 +180,14 @@ class GridAgent(FullAgent):
 
             #poloidal transitions
             if action == "north":
-                x = (x - 1) % self.dims[1]
                 self.transitions[0, x, y] = 0
             elif action == "south":
+                y = (y - 1) % self.dims[0]
                 self.transitions[0, x, y] = 0
             #toroidal transitions
             elif action == "east":
                 self.transitions[1, x, y] = 0
             else: # west
-                y = (y - 1) % self.dims[0]
+                x = (x - 1) % self.dims[1]
                 self.transitions[1, x, y] = 0
 
