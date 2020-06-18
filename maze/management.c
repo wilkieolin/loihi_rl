@@ -147,7 +147,7 @@ void run_cycle(runState *s) {
   send_state(s);
 
   //send the final estimates
-  if ((s->time_step / voting_epoch) % (epochs) == 1) {
+  if ((s->time_step / voting_epoch) % (epochs) == epochs - 1) {
     send_estimates();
   }
   
@@ -159,12 +159,6 @@ void setup(runState *s) {
   int cxId = 0;
   NeuronCore *nc;
   int voltage = 0;
-
-  //MODULO DEBUG
-  for (int i = -25; i < 25; i++) {
-      printf("%d ", mod(i, N_STATES));
-  }
-  printf("\n");
 
   //check things are defined
   if (N_ACTIONS == 0 || N_STATES == 0) {
@@ -359,17 +353,21 @@ int advance_state(int action) {
   if (action == North) { //map actions/locations to unique transitions between points on a toroid
     transition[0] = location[0];
     transition[1] = mod(location[1], GRID_Y);
+    allowed = (bool)toroidalTransitions[transition[0]][transition[1]];
   } else if (action == South) {
     transition[0] = location[0];
     transition[1] = mod((location[1] - 1), GRID_Y);
+    allowed = (bool)toroidalTransitions[transition[0]][transition[1]];
   } else if (action == East) {
     transition[0] = mod(location[0], GRID_X);
     transition[1] = location[1];
+    allowed = (bool)poloidalTransitions[transition[0]][transition[1]];
   } else { //West
     transition[0] = mod((location[0] - 1), GRID_X);
     transition[1] = location[1];
+    allowed = (bool)poloidalTransitions[transition[0]][transition[1]];
   }
-  allowed = (bool)toroidalTransitions[transition[0]][transition[1]];
+  
 
   if (allowed) { //update the location if that transition is allowed
     if (action == North) {

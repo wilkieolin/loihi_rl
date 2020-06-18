@@ -146,7 +146,7 @@ void run_cycle(runState *s) {
   send_state(s);
 
   //send the final estimates
-  if ((s->time_step / voting_epoch) % (epochs) == 1) {
+  if ((s->time_step / voting_epoch) % (epochs) == epochs - 1) {
     send_estimates();
   }
   

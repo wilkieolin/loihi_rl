@@ -288,16 +288,14 @@ class FullAgent(Agent):
         self._start()
         self._send_config()
 
-    def run(self, n_epochs):
+    def run(self):
         #only reserve hardware once we actually need to run the network
         if not self.started:
             self.init()
             self.started = True
 
-        assert n_epochs in range(1, self.n_epochs + 1), "Must run between 1 and the set number of n_epochs."
-
-        self.board.run(self.l_epoch * n_epochs)
-        self.get_data(n_epochs)
+        self.board.run(self.l_epoch * self.n_epochs)
+        self.get_data(self.n_epochs)
 
         #return (self.data, self.rewards)
         return (self.data, self.rewards, self.values)
