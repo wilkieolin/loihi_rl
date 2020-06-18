@@ -65,7 +65,7 @@ class GridAgent(FullAgent):
         includeDir = os.getcwd()
         self.snip = self.board.createSnip(Phase.EMBEDDED_MGMT,
                                     includeDir=includeDir,
-                                    cFilePath = includeDir + "/management2.c",
+                                    cFilePath = includeDir + "/management.c",
                                     funcName = "run_cycle",
                                     guardName = "check")
 

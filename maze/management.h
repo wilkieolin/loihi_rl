@@ -1,10 +1,18 @@
 #include "nxsdk.h"
+//Loihi functions
 int check(runState *s);
-int get_reward(int p);
 void get_counter_voltages();
-void reset_counter_voltages();
 int get_highest();
+void reset_counter_voltages();
 void run_cycle(runState *s);
 void setup(runState *s);
-int map_loc_to_state();
+int send_action(runState *s);
+void send_reward(runState *s, int action);
 void send_state(runState *s);
+void send_estimates();
+
+//Game functions
+int advance_state(int action);
+void random_start();
+int map_state_to_index();
+int mod(int a, int b);
