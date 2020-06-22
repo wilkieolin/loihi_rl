@@ -1,7 +1,7 @@
 import nxsdk.api.n2a as nx
-noise_kwargs = {'randomizeCurrent' : 1,
+noise_kwargs = {'randomizeVoltage' : 1,
                     'noiseMantAtCompartment': 0,
-                    'noiseExpAtCompartment' : 6}
+                    'noiseExpAtCompartment' : 10}
 
 def create_prototypes(vth=255, logicalCoreId=-1, noisy=0, synscale=1):
     prototypes = {}

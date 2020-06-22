@@ -58,7 +58,7 @@ if (useProbe):
     ctx_spks = player.cortex.get_outputs().probe(nx.ProbeParameter.SPIKE, probeCond)
 
 for i in range(runs):
-    result = player.run(episodes)
+    result = player.run()
 
     results['states'].append(result[0])
     results['outcomes'].append(result[1])

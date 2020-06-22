@@ -540,43 +540,12 @@ def connect_one_to_one(source, target, prototype):
                         connectionMask=mask)
 
 """
-Connect two-dimensional nodes along a single axis. 
+Connect two-dimensional nodes along a single axis. **DEPRECATED**
 """
 def connect_along_axis(source, source_shape, source_axis, target, target_shape, target_axis, prototype):
     print("Deprecated to dense_along_axis")
     return dense_along_axis(source, source_shape, source_axis, target, target_shape, target_axis, prototype)
-    # assert source_shape[source_axis] == target_shape[target_axis], "Dimensions do not match:" + str(source_shape) + str(target_shape)
 
-    # def generate_mask():
-    #     assert source_shape[source_axis] == target_shape[target_axis]
-        
-    #     n = source_shape[source_axis]
-    #     n_ds = len(source_shape)
-    #     n_dd = len(target_shape)
-    #     connections = []
-    #     for i in range(n):
-    #         #set elements along the desired axis to 1
-    #         in_indices = [Ellipsis for i in range(n_ds)]
-    #         in_indices[source_axis] = i
-            
-    #         out_indices = [Ellipsis for i in range(n_dd)]
-    #         out_indices[target_axis] = i
-            
-    #         in_mat = np.zeros(source_shape)
-    #         in_mat[tuple(in_indices)] = 1
-            
-    #         out_mat = np.zeros(target_shape)
-    #         out_mat[tuple(out_indices)] = 1
-            
-    #         #generate the connections between the flattened views of those objects
-    #         connections.append(np.matmul(in_mat.reshape(-1,1), out_mat.reshape(-1,1).transpose()))
-        
-    #     return reduce(np.add, connections).transpose()
-
-    # mask = generate_mask()
-    # return source.connect(target,
-    #                     prototype=prototype,
-    #                     connectionMask=mask)
 
 """
 Densely connect each slice of the source and target tensors along a single, matching axis.

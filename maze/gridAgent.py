@@ -166,10 +166,10 @@ class GridAgent(FullAgent):
         #add the walls bounding the maze's area
         if rectBounds:
             for i in range(5):
-                #the right (toroidal) wall
-                self.walls.append((i, self.dims[1]-1, "east"))
                 #the bottom (poloidal) wall
-                self.walls.append((self.dims[0]-1, i, "south"))
+                self.walls.append((i, self.dims[0]-1, "north"))
+                #the right (toroidal) wall
+                self.walls.append((self.dims[1]-1, i, "east"))
 
         self.transitions = np.ones((2,self.dims[0], self.dims[1]), dtype=np.int)
 

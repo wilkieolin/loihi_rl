@@ -367,13 +367,13 @@ int advance_state(int action) {
 
   if (allowed) { //update the location if that transition is allowed
     if (action == North) {
-      location[1] = mod((location[1] + 1), GRID_Y);
+      location[1] = (location[1] + 1);
     } else if (action == South) {
-      location[1] = mod((location[1] - 1), GRID_Y);
+      location[1] = (location[1] - 1);
     } else if (action == East) {
-      location[0] = mod((location[0] + 1), GRID_X);
+      location[0] = (location[0] + 1);
     } else { //West
-      location[0] = mod((location[0] - 1), GRID_X);
+      location[0] = (location[0] - 1);
     }
   }
 
@@ -381,12 +381,13 @@ int advance_state(int action) {
   if (location[0] == rewardLocation[0] && location[1] == rewardLocation[1]) {
     reward = 1;
     random_start();
-  } else if (step > LIFESPAN) {
+  } else if (step >= LIFESPAN) {
     reward = -1;
     random_start();
+  } else {
+    step++;
   }
 
-  step++;
   return reward;
 }
 
