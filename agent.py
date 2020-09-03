@@ -324,7 +324,7 @@ class FullAgent(Agent):
 
         return (reward, punishment, draw)
 
-     """
+    """
     Define what data should be expected from the board each epoch and collect it. 
     This is implemented via the child class (e.g. blackjack) as requirements are different for each application.
     """

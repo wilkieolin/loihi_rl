@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+"""
+Analysis functions, mainly used for the blackjack example.
+"""
 def to_gap(rates):
     action_rates = rates.mean(axis=2)
     actions = action_rates[1,:] - action_rates[0,:]
