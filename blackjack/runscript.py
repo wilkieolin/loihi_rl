@@ -17,7 +17,7 @@ n_estimates = n_states * n_actions
 
 dynrange = 2
 replicates = 5
-runs = 100
+runs = 1
 l_epoch = 128
 episodes = int(1e4)
 useProbe = False
