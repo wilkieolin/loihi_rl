@@ -6,6 +6,15 @@ import numpy as np
 import re
 from nxsdk.graph.monitor.probes import *
 
+"""
+Long-term memory or 'cortex' module which tracks the rewards which can be expected for each state.
+Currently this is done via a rate-based tabular solution, but any function approximator which can
+represent values given a state can be used.
+"""
+
+"""
+Standard tabular cortex module which uses the tracker nodes to encode rate-based estimates of reward.
+"""
 class Cortex(ProcessNode):
     def __init__(self, agent, logicalCore=-1, **kwargs):
         self.n_actions = agent.n_actions
@@ -32,6 +41,10 @@ class Cortex(ProcessNode):
     def get_synproto(self):
         return self.blocks['estimates'].get_synproto()
 
+"""
+Cortex module with multiple trackers representing single states; this trades off runtime for more compartments used,
+as averaging multiple rate-firing values overtime is multiplexed through space.
+"""
 class MultiCortex(ProcessNode):
     def __init__(self, agent, logicalCore=-1, **kwargs):
         self.n_actions = agent.n_actions

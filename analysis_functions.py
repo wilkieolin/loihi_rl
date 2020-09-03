@@ -7,8 +7,8 @@ def to_gap(rates):
     return actions.reshape(2,10,10).transpose(0,2,1)
 
 def normalize(estimates, conditions):
-    scale = (conditions['dynrange']) * (2**7-1) / 2
-    return (estimates + scale)/(2*scale)
+    scale = (conditions['dynrange']) * (2**8-1) * (2**6)
+    return (estimates + scale)/(scale)
 
 def unitary_normalize(x):
     return x * 0.5 + 1

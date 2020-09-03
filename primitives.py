@@ -139,7 +139,7 @@ class SoftResetNode(ProcessNode):
 
     
 """
-Q-Tracker node which fires at a rate proportional to the number of reward spikes over spikes received at the 
+Tracker node which fires at a rate proportional to the number of reward spikes over spikes received at the 
 reward and punishment nodes.
 """
 class TrackerNode(ProcessNode):
@@ -363,8 +363,8 @@ class RingOscNode(ProcessNode):
 Create a dummy counter node which only accumulates voltage as spikes are received. 
 This is usually used to count spikes and is read and reset by a SNIP.
 
-Effectively should be the same as the Lakemont registers for the same purpose, but the latter
-seem to have some glitches which can be hard to track down. 
+Effectively should be the same as the Lakemont registers for the same purpose, but 
+can sometimes be more convenient to use and read-out.
 """
 class CounterNode(ProcessNode):
     def __init__(self, network, shape, logicalCore=-1, **kwargs):
@@ -388,7 +388,7 @@ class CounterNode(ProcessNode):
 
 """
 Takes the average of incoming nodes by splitting their charge proportionally to the number of inputs and firing
-at the average combined rate. Much simpler implementation then the sampling Avg node but has int math based errors.
+at the average combined rate. Much simpler implementation then the sampling Avg node but has integer math based biases.
 """
 class QAverageNode(ProcessNode):
     def __init__(self, network, shape, logicalCore=-1, **kwargs):
@@ -414,7 +414,7 @@ class QAverageNode(ProcessNode):
     
 
 """
-A node which follows the spiking rate of the inputs. Similar to Q-Tracker but the inputs are used to update firing rates every step
+A node which follows the spiking rate of the inputs. Similar to Tracker but the inputs are used to update firing rates *every* step
 instead of being gated by the presence/absence of a reward/punishment signal. 
 """
 class FollowerNode(ProcessNode):
@@ -506,18 +506,6 @@ class AveragePoolNode(ProcessNode):
     def get_synproto(self):
         return self.blocks['filter'].get_synproto()
 
-# TODO  
-# def WinnerTakeAllNode(ProcessNode):
-#     def __init__(self, network, shape, logicalCore=-1, **kwargs):
-
-
-#         super().__init__(network, shape, logicalCore)
-
-#         self.blocks = {}
-#         # self._create_prototypes()
-#         # self._create_blocks()
-#         # self._create_connections()
-
 
 # -- CONNECTIVITY -- #
 
@@ -587,6 +575,10 @@ def dense_along_axis(source, source_shape, source_axis, target, target_shape, ta
                         connectionMask=mask)
         
 
+"""
+Generate an adjacency matrix which generates the adjacencies required to connect all elements of tensor's projection
+to all of its higher-order elements along the projected axis.
+"""
 def get_adjacency(shape, axis):
     dims = len(shape)
     new_dims = dims - 1
@@ -634,10 +626,10 @@ def project_along_axis(source, source_shape, source_axis, target, target_shape, 
         
 """
 Project a source's compartments to all elements along a target axis in the target.
-Used to create replicate connections.
+Used to create replicate data from one source to multiple targets.
 """
 def expand_along_axis(source, source_shape, target, target_shape, target_axis, prototype):
-    #ensure the target shape is 
+    #ensure the target shape is compatible
     shape_check = tuple(np.delete(np.array(target_shape), target_axis))
     assert source_shape == shape_check, "Target shape must be the same as source shape except for the addition of a single axis the source is expanding over."
 
@@ -650,7 +642,8 @@ def expand_along_axis(source, source_shape, target, target_shape, target_axis, p
 """
 Create all-to-all connections between two nodes.
 (1->1), (1->2), ... , (1->n), 
-(2->1), (2->2), ... , (n->n)
+(2->1), (2->2), ... , (2->n)
+                ... , (n->n)
 """
 def connect_full(source, target, prototype):
     return source.connect(target, prototype=prototype)

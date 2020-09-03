@@ -37,14 +37,13 @@ class DummyAgent(Agent):
         super().__init__(n_actions, n_states)
 
 """
-Used to construct an agent which is being tested/used before being ported to the Loihi chip.
+Used to construct an agent which is being tested/used on CPU before being ported to the Loihi chip.
 """
 class ManualAgent(Agent):
     def __init__(self, n_actions, n_states, **kwargs):
         super().__init__(n_actions, n_states)
 
         #get estimation parameters
-        self.multiplicity = kwargs.get("multiplicity", 1)
         self.l_epoch = kwargs.get("l_epoch", 128)
         self.n_epochs = kwargs.get("n_epochs", 100)
         self.seed = kwargs.get("seed", 341257896)
@@ -106,14 +105,20 @@ class FullAgent(Agent):
         super().__init__(n_actions, n_states)
 
         #get estimation parameters
-        self.multiplicity = kwargs.get("multiplicity", 1)
+        #the number of periods which the agent will use to estimate value and decide what action to take
         self.l_epoch = kwargs.get("l_epoch", 128)
+        #number of epochs to run the agent for
         self.n_epochs = kwargs.get("n_epochs", 100)
+        #number of replicates for each representation of value
         self.n_replicates = kwargs.get("n_replicates", 1)
+        #the scale between changes in value representation and tracker neuron threshold. i.e. higher values effectively lead to lower learning rates.
         self.dynrange = kwargs.get("dynrange", 1)
+        #calculate the total number of estimates being used in the agent
         self.n_memories = self.n_estimates * self.n_replicates
 
+        #whether the value estimates will be noisy
         self.noisy = kwargs.get("noisy", False)
+        #RNG seed to break ties between equal values
         self.seed = kwargs.get("seed", 341257896)
 
         self.recordWeights = kwargs.get('recordWeights', False)
@@ -125,6 +130,9 @@ class FullAgent(Agent):
         self._connect_blocks()
 
 
+    """
+    Create the higher-level process nodes (encoder, STM, LTM, decoder) which allow the agent to carry out RL learning.
+    """
     def _create_blocks(self):
         #create the environment-agent interface (decoder)
         self.decoder = decoder.Decoder(self, -1)
@@ -148,6 +156,9 @@ class FullAgent(Agent):
         self.stubs['punishment'] = self.network.createInputStubGroup(size=1)
         self.stubs['draw'] = self.network.createInputStubGroup(size=1)
 
+    """
+    Create the connections between blocks to transfer information from one high-level node to another.
+    """
     def _connect_blocks(self):
         hc_SA_in, self.rwd_in, self.pun_in = self.hippocampus.get_inputs()
         hc_reset = self.hippocampus.blocks['feedback_sum'].get_inputs()
@@ -201,27 +212,49 @@ class FullAgent(Agent):
         self.connections['pun_stub_HC'] = connect_full(self.stubs['punishment'], self.pun_in, self.feedback_proto)
         self.connections['draw_stub_HC'] = connect_full(self.stubs['draw'], hc_reset, self.feedback_proto)
 
+    """
+    Compile the network to a board. Called once before starting.
+    """
     def _compile(self):
         self.compiler = nx.N2Compiler()
         self.board = self.compiler.compile(self.network)
         self.board.sync = True
 
+    """
+    Create the channels between board and host required for communicating and tracking results.
+    This is implemented via the child class (e.g. blackjack) as requirements are different for each application.
+    """
     @abstractmethod
     def _create_channels(self):
         pass
 
+    """
+    Create the SNIPs on a board which are required for communication and coprocessing.
+    This is implemented via the child class (e.g. blackjack) as requirements are different for each application.
+    """
     @abstractmethod
     def _create_SNIPs(self):
         pass
 
+    """
+    Define what information to send to the board at startup. Usually this is at very least parameters like l_epoch and n_epochs.
+    This is implemented via the child class (e.g. blackjack) as requirements are different for each application.
+    """
     @abstractmethod
     def _send_config(self):
         pass
 
+    """
+    Reserve and start hardware.
+    """
     def _start(self):
         assert hasattr(self, 'board') and hasattr(self, 'snip'), "Must have compiled board and snips before starting."
         self.board.startDriver()
 
+    """
+    From the compiled board, return the location of axons which allow an external program (SNIP) to indicate to the agent
+    which action was taken. 
+    """
     def get_action_locations(self):
         get_axonid = lambda x: self.connections['action_stub_ACT'][x].inputAxon.nodeId
         get_axon = lambda x: self.network.resourceMap.inputAxon(x)[0]
@@ -231,6 +264,10 @@ class FullAgent(Agent):
 
         return axons 
 
+    """
+    From the compiled board, return the location of all compartments which represent values. For a tabular solution,
+    this is a large list of compartments. 
+    """
     def get_estimate_locations(self):
         locs = []
 
@@ -244,6 +281,10 @@ class FullAgent(Agent):
 
         return locs
 
+    """
+    From the compiled board, return the location of axons which allow an external program to indicate the current state
+    the agent has entered. 
+    """
     def get_state_locations(self):
         get_axonid = lambda x: self.connections['state_stub_DEC'][x].inputAxon.nodeId
         get_axon = lambda x: self.network.resourceMap.inputAxon(x)[0]
@@ -253,6 +294,10 @@ class FullAgent(Agent):
 
         return axons 
 
+    """
+    From the compiled board, return the location of compartments which represent the rewards currently being used to make
+    a decision. This is usually the number of actions available in each state. 
+    """
     def get_value_locations(self):
         locs = []
         compartments = self.encoder.get_outputs()
@@ -265,6 +310,10 @@ class FullAgent(Agent):
 
         return locs
 
+    """
+    From the compiled board, return the location of axons which allow an external program to indicate a reward or punishment
+    signal to the agent. 
+    """
     def get_RP_locations(self):
         get_axonid = lambda x: self.connections[x][0].inputAxon.nodeId
         get_axon = lambda x: self.network.resourceMap.inputAxon(x)[0]
@@ -275,10 +324,17 @@ class FullAgent(Agent):
 
         return (reward, punishment, draw)
 
+     """
+    Define what data should be expected from the board each epoch and collect it. 
+    This is implemented via the child class (e.g. blackjack) as requirements are different for each application.
+    """
     @abstractmethod
     def get_data(self, n_epochs):
         pass        
 
+    """
+    Initialize the agent into hardware and start it up.
+    """
     def init(self):
         self._compile()
         self._create_SNIPs()
@@ -288,6 +344,9 @@ class FullAgent(Agent):
         self._start()
         self._send_config()
 
+    """
+
+    """
     def run(self):
         #only reserve hardware once we actually need to run the network
         if not self.started:
@@ -300,6 +359,10 @@ class FullAgent(Agent):
         #return (self.data, self.rewards)
         return (self.data, self.rewards, self.values)
 
+    """
+    Set parameters in header files which SNIPS may read out from disk (e.g. N_ACTIONS, N_STATES).
+    This is implemented via the child class (e.g. blackjack) as requirements are different for each application.
+    """
     @abstractmethod
     def set_params_file(self):
         pass

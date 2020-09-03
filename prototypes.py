@@ -1,4 +1,12 @@
+"""
+File which stores the prototypes required for most of the more advanced constructions. This can avoid copying code
+and reduces the chance of conflicting parameters being set in different files (e.g. different levels of noise on a 
+single logical core). 
+
+
+"""
 import nxsdk.api.n2a as nx
+
 noise_kwargs = {'randomizeVoltage' : 1,
                     'noiseMantAtCompartment': 0,
                     'noiseExpAtCompartment' : 10}
@@ -133,18 +141,6 @@ def create_prototypes(vth=255, logicalCoreId=-1, noisy=0, synscale=1):
                                 **noise_kwargs
                                 )
 
-    #WTA
-    # c_prototypes['noisyWTAProto'] = nx.CompartmentPrototype(biasMant=10,
-    #                                     biasExp = 6,
-    #                                     vThMant = 100,
-    #                                     logicalCoreId=0,
-    #                                     compartmentVoltageDecay=0,
-    #                                     compartmentCurrentDecay=128,
-    #                                     enableNoise=1,
-    #                                     noiseMantAtCompartment=0,
-    #                                     noiseExpAtCompartment=11,
-    #                                     functionalState = nx.COMPARTMENT_FUNCTIONAL_STATE.IDLE)
-
     #Counter
     v_th_max = 2**17-1
     c_prototypes['counterProto'] = nx.CompartmentPrototype(vThMant=v_th_max,
@@ -156,6 +152,7 @@ def create_prototypes(vth=255, logicalCoreId=-1, noisy=0, synscale=1):
                                 )
 
     #Connections
+    #scaled vth used when synscale is being used to increase dynamic range
     vth = vth/synscale
 
     s_prototypes['econn'] = nx.ConnectionPrototype(weight=2)

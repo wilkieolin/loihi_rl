@@ -15,19 +15,19 @@ n_states = n_cards**2 * 2
 n_actions = 2
 n_estimates = n_states * n_actions
 
-dynrange = 10
-replicates = 3
+dynrange = 2
+replicates = 5
 runs = 100
 l_epoch = 128
 episodes = int(1e4)
 useProbe = False
 
-#init_vals = np.zeros((n_actions,2,10,10,replicates),dtype=np.int)
+init_vals = np.zeros((n_actions,2,10,10,replicates),dtype=np.int)
 # init_vals[0,:,:,8:] = -1.0
 # init_vals[1,:,:,8:] = 1.0
 
-init_data = p.load(open("blackjack_run13_1.p","rb"))
-init_vals = init_data['final_estimates'][-1]
+# init_data = p.load(open("blackjack_run13_1.p","rb"))
+# init_vals = init_data['final_estimates'][-1]
 
 conditions = {'dynrange' : dynrange,
             'replicates' : replicates,
@@ -70,4 +70,4 @@ for i in range(runs):
 
 player.board.disconnect()
 
-p.dump(results, open("blackjack_run13_2.p", "wb"))
+p.dump(results, open("blackjack_run_3.p", "wb"))

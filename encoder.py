@@ -6,9 +6,15 @@ import numpy as np
 import re
 from nxsdk.graph.monitor.probes import *
 
+
 """
-Takes the reward estimates from the cortex and selects only action estimates relevant to current state,
-"encodes" the rewards into a decision on what action to take that is fed back into the environment.
+The encoder module takes all estimates which the cortex provides and selects only the one relevant to the
+current state. The module then uses the reward estimates to select the best possible action, and sends this
+signal to the environment. 
+"""
+
+"""
+Encoder node which pairs with the simple Cortex node. Arg max function over rewards is done via SNIP.
 """
 class Encoder(ProcessNode):
     def __init__(self, agent, logicalCore=-1):
@@ -52,6 +58,10 @@ class Encoder(ProcessNode):
     def get_synproto(self):
         return self.blocks['filter'].get_synproto()
 
+"""
+Encoder node which pairs with the MultiCortex node, and averages over all representations of reward for a state.
+Arg max function over rewards is done via SNIP.
+"""
 class MultiEncoder(ProcessNode):
     def __init__(self, agent, logicalCore=-1):
         self.n_actions = agent.n_actions
