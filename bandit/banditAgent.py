@@ -12,7 +12,7 @@ Agent which is used for the multi-arm bandit task.
 """
 class Bandit(FullAgent):
     def __init__(self, probabilities, **kwargs):
-        #force n_states to 1 if we're doing a simple bandit
+        #force n_states to 1 for a non-conditional bandit
         n_actions = len(probabilities)
         n_states = 1
         #print(n_action, n_states)
@@ -23,13 +23,18 @@ class Bandit(FullAgent):
         self.start_values *= self.dynrange*127*2**6
         self.start_values = self.start_values.astype('int')
 
+        #set the chance a non-optimal action will be sampled (epsilon)
         self.epsilon = int(kwargs.get("epsilon", 0.10) * 100)
+        #initialize the reward probabilities
         self.probabilities = np.array(probabilities) * 100
         self.probabilities = self.probabilities.astype('int')
+        #debug flag which will print out each epoch in detail
         self.debug = kwargs.get("debug", False)
+        #the number of data points which will be read from the board each epoch
         self.data_points = 1
 
     def _create_SNIPs(self):
+        #create the SNIP which will manage rewards and actions
         assert hasattr(self, 'board'), "Must compile net to board before creating SNIP."
         includeDir = os.getcwd()
         self.snip = self.board.createSnip(Phase.EMBEDDED_MGMT,

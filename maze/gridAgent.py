@@ -17,6 +17,7 @@ class GridAgent(FullAgent):
         n_actions = 4
         super().__init__(n_actions, n_states, **kwargs)
         #get starting values to form the initial greedy policy
+        self.lifespan = kwargs.get("lifespan", 8)
         self.start_values = kwargs.get("starting_values", np.zeros((self.dims[0], self.dims[1], self.n_replicates), dtype='int'))
         self.walls = kwargs.get("walls", [])
         self.set_valid_transitions()
@@ -149,6 +150,11 @@ class GridAgent(FullAgent):
             m = re.match(r'^#define\s+DEBUG', line)
             if m is not None:
                 line = '#define DEBUG ' + str(int(self.debug)) + '\n'
+
+            #update lifespan
+            m = re.match(r'^#define\s+LIFESPAN', line)
+            if m is not None:
+                line = '#define LIFESPAN ' + str(int(self.lifespan)) + '\n'
 
             #update n_replicates
             m = re.match(r'^#define\s+N_REPLICATES', line)
