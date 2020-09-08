@@ -1,7 +1,7 @@
 #define N_CARDS 10
 #define N_STATES 200
 #define N_ACTIONS 2
-#define N_REPLICATES 5
+#define N_REPLICATES 2
 #define N_ESTIMATES (N_ACTIONS*N_STATES)
 #define N_MEMORIES (N_ESTIMATES*N_REPLICATES)
 #define N_POINTS 4

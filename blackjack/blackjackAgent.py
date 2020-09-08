@@ -40,7 +40,7 @@ class BlackjackAgent(FullAgent):
         setupChannel = self.board.createChannel(b'setupChannel', "int", n_outData)
         connect(True, setupChannel)
 
-        #create the data channels to return location & action at each epoch
+        #create the data channels to return state & action at each epoch
         dataChannel = self.board.createChannel(b'dataChannel', "int", self.data_points * self.n_epochs)
         connect(False, dataChannel)
 
