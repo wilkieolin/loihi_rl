@@ -218,7 +218,7 @@ class FullAgent(Agent):
     def _compile(self):
         self.compiler = nx.N2Compiler()
         self.board = self.compiler.compile(self.network)
-        self.board.sync = True
+        #self.board.sync = True
 
     """
     Create the channels between board and host required for communicating and tracking results.

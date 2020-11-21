@@ -5,6 +5,9 @@ sys.path.append("..")
 from agent import *
 import numpy as np
 
+from nxsdk.graph.monitor.probes import PerformanceProbeCondition
+from nxsdk.api.enums.api_enums import ProbeParameter
+
 """
 Agent which is used for the blackjack task.
 """
@@ -18,6 +21,7 @@ class BlackjackAgent(FullAgent):
 
         self.debug = kwargs.get("debug", False)
         self.data_points = 4
+        self.probe = kwargs.get("probe", False)
 
 
     def _create_channels(self):
@@ -58,12 +62,23 @@ class BlackjackAgent(FullAgent):
 
     def _create_SNIPs(self):
         assert hasattr(self, 'board'), "Must compile net to board before creating SNIP."
+        if self.probe:
+            self.probeCond = PerformanceProbeCondition(tStart=self.l_epoch+1, 
+                tEnd=self.l_epoch*1000, 
+                bufferSize=self.l_epoch*10, 
+                binSize=8)
+
+            self.tProbe = self.board.probe(ProbeParameter.EXECUTION_TIME, self.probeCond)
+            self.eProbe = self.board.probe(ProbeParameter.ENERGY, self.probeCond)
+
         includeDir = os.getcwd()
         self.snip = self.board.createSnip(Phase.EMBEDDED_MGMT,
                                     includeDir=includeDir,
                                     cFilePath = includeDir + "/management.c",
                                     funcName = "run_cycle",
                                     guardName = "check")
+
+        
 
     def get_data(self, n_epochs):
         dataChannel = self.inChannels[0]
