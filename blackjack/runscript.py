@@ -21,6 +21,7 @@ runs = 1
 l_epoch = 128
 episodes = int(1e4)
 useProbe = False
+probePower = True
 
 init_vals = np.zeros((n_actions,2,10,10,replicates),dtype=np.int)
 # init_vals[0,:,:,8:] = -1.0
@@ -41,7 +42,8 @@ player = BlackjackAgent(n_actions,
                         l_epoch = l_epoch,
                         starting_values = init_vals,
                         dynrange = dynrange,
-                        n_replicates = replicates)
+                        n_replicates = replicates,
+                        probe = True)
 
 
 results = {}

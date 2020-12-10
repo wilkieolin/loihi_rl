@@ -63,12 +63,12 @@ class BlackjackAgent(FullAgent):
     def _create_SNIPs(self):
         assert hasattr(self, 'board'), "Must compile net to board before creating SNIP."
         if self.probe:
-            self.probeCond = PerformanceProbeCondition(tStart=self.l_epoch+1, 
+            self.probeCond = PerformanceProbeCondition(tStart=1, 
                 tEnd=self.l_epoch*1000, 
-                bufferSize=self.l_epoch*10, 
+                bufferSize=self.l_epoch, 
                 binSize=8)
 
-            self.tProbe = self.board.probe(ProbeParameter.EXECUTION_TIME, self.probeCond)
+            #self.tProbe = self.board.probe(ProbeParameter.EXECUTION_TIME, self.probeCond)
             self.eProbe = self.board.probe(ProbeParameter.ENERGY, self.probeCond)
 
         includeDir = os.getcwd()

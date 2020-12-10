@@ -246,13 +246,14 @@ void setup(runState *s) {
 int send_action(runState *s) {
   int action = 0;
 
-  //choose a random first action for exploring starts
+  //get the firing rates for action-value estimates
+  get_counter_voltages();
+  reset_counter_voltages();
+
   if (step == 0) {
+    //choose a random first action for exploring starts
     action = rand() % N_ACTIONS;
   } else {
-    //get the firing rates for action-value estimates
-    get_counter_voltages();
-    reset_counter_voltages();
     //use a greedy policy to select the highest estimated reward
     action = get_highest();
   }
