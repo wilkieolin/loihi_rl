@@ -11,9 +11,9 @@ def read_history(state_actions):
     state_conversion = {0: False, 1: True}
     action_conversion = {0: 'Hit', 1: 'Stick'}
     
-    data = {'Player Sum' : state_actions[:,1], 'Dealer Card' : state_actions[:,2]}
-    data['Usable Ace'] = [state_conversion[x] for x in state_actions[:,3]]
-    data['Action'] = [action_conversion[x] for x in state_actions[:,0]]
+    data = {'Player Sum' : state_actions[:,0], 'Dealer Card' : state_actions[:,1]}
+    data['Usable Ace'] = [state_conversion[x] for x in state_actions[:,2]]
+    data['Action'] = [action_conversion[x] for x in state_actions[:,3]]
     
     df = pd.DataFrame(data)
     return df
