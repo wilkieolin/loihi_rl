@@ -1,5 +1,7 @@
 import numpy as np
 import random
+import matplotlib.pyplot as plt
+from banditAgent import Bandit
 
 def avgmoa(choices, probs):
     trials = choices.shape[0]
@@ -60,6 +62,8 @@ def plot_avg_reward(rewards, **kwargs):
     plt.xlabel("Epoch")
     plt.ylabel("Average reward over 100 epochs")
 
+
+
 def plot_choices(actions, probabilities, **kwargs):
     episodes = actions.shape[0]
     optimal_arm = np.argmax(probabilities)
@@ -76,16 +80,37 @@ def plot_choices(actions, probabilities, **kwargs):
     plt.xlabel("Epoch")
     plt.ylabel("Mean optimal action over 100 epochs")
 
-def run_epsilon_trials(probabilities, epsilons, trials=5, episodes=1000):
+def plot_moa(actions, probabilities, **kwargs):
+    episodes = actions.shape[0]
+    optimal_arm = np.argmax(probabilities)
+
+    plt.figure(**kwargs)
+    plt.plot(np.convolve((actions == optimal_arm).ravel()*1, np.ones(100), mode='valid')/100)
+    plt.xlabel("Epoch")
+    plt.ylabel("Mean optimal action over 100 epochs")
+
+def plot_choices(actions, probabilities, **kwargs):
+    episodes = actions.shape[0]
+
+    plt.figure(**kwargs)
+
+    plt.scatter(np.arange(episodes), actions)
+    plt.xlabel("Epoch")
+    plt.ylabel("Arm Chosen")
+
+
+def run_trials(probabilities, epsilons, l_epoch = 128, trials=5, episodes=1000):
     n_epsilons = len(epsilons)
 
     results = {}
     makearr = lambda: np.zeros((n_epsilons, trials))
     loihi_moa = makearr()
-    loihi_rwd = makearr()
+    loihi_avgrwd = makearr()
+    loihi_results = []
     
     cpu_moa = makearr()
-    cpu_rwd = makearr()
+    cpu_avgrwd = makearr()
+    cpu_results = []
     
     INTMAX = np.iinfo(np.int32).max
     
@@ -99,18 +124,51 @@ def run_epsilon_trials(probabilities, epsilons, trials=5, episodes=1000):
             
             loihi_moa[i,t] = avgmoa(actions, probabilities)
             #remap loihi (-1, 1) rewards to (0,1) before averaging
-            loihi_rwd[i,t] = np.mean(rewards == 1)
+            loihi_avgrwd[i,t] = np.mean(rewards == 1)
+            loihi_results.append((actions, rewards))
             
             #run the CPU bandit, seed automatically advances
             actions, rewards, _ = egreedy(episodes, epsilon, 0.01, probabilities)
             cpu_moa[i,t] = avgmoa(actions, probabilities)
-            cpu_rwd[i,t] = np.mean(rewards)
+            cpu_avgrwd[i,t] = np.mean(rewards)
+            cpu_results.append((actions, rewards))
             
     results['loihi_moa'] = loihi_moa
-    results['loihi_rwd'] = loihi_rwd
+    results['loihi_avgrwd'] = loihi_avgrwd
+    results['loihi_results'] = loihi_results
+    
     results['cpu_moa'] = cpu_moa
-    results['cpu_rwd'] = cpu_rwd
+    results['cpu_avgrwd'] = cpu_avgrwd
+    results['cpu_results'] = cpu_results
     
     return results
             
+def test_rate_coding(probabilities, l_epochs, epsilon=0.05, trials=5, episodes=1000):
+    
+    n_vars = len(l_epochs)
+    results = {}
+    makearr = lambda: np.zeros((n_vars, trials))
+    loihi_moa = makearr()
+    loihi_avgrwd = makearr()
+    loihi_results = []
+    
+    INTMAX = np.iinfo(np.int32).max
+    
+    for (i, l_epoch) in enumerate(l_epochs):
+        for t in range(trials):
+            #run the Loihi trial with a new seed
+            seed = np.random.randint(INTMAX)
+            bandit = Bandit(probabilities, epsilon=epsilon, l_epoch = l_epoch, n_replicates = 1, n_epochs = episodes, seed=seed)
+            actions, rewards, _ = bandit.run()
+            bandit.board.disconnect()
             
+            loihi_moa[i,t] = avgmoa(actions, probabilities)
+            #remap loihi (-1, 1) rewards to (0,1) before averaging
+            loihi_avgrwd[i,t] = np.mean(rewards == 1)
+            loihi_results.append((actions, rewards))
+            
+    results['moa'] = loihi_moa
+    results['avgrwd'] = loihi_avgrwd
+    results['full_results'] = loihi_results
+    
+    return results
